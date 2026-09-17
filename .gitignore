@@ -1,0 +1,6 @@
+AM2R_11
+autopatcher
+libs/*.so*
+!libs/libopenal.so.1
+profiles
+launcher

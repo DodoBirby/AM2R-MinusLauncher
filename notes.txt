@@ -1,0 +1,20 @@
+play button does one of these depending on state:
+  download:
+    clone the autopatcher repository
+
+  select 1.1:
+    create a file dialog for locating the 1.1 zip
+
+  install:
+    verify xdelta is installed
+    extract 1.1 to a temp path
+    patch the data.win and exe
+    move exe a folder out
+    copy everything from files_to_copy
+    lowercase everything
+    do some things with mesa?
+    copy profile.xml
+    copy from temp to profile
+
+  play:
+    disable fullscreen if no config exists

@@ -1,0 +1,15 @@
+/*
+#include <dirent.h>
+#include <stdio.h>
+
+int main()
+{
+    DIR* dir = opendir("profiles/modtest");
+    struct dirent* ent;
+    while ((ent = readdir(dir)) != NULL)
+    {
+        printf("%s %d\n", ent->d_name, ent->d_type);
+    }
+    return 0;
+}
+*/
