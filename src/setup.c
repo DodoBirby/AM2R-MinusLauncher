@@ -7,13 +7,12 @@
 #include "launcher.h"
 
 char* repo = "https://github.com/AM2R-Community-Developers/AM2R-Autopatcher-Linux.git";
-char* patchDataPath = "autopatcher";
-char* pathTo11 = "AM2R_11";
+char* patchDataPath = "resources/autopatcher";
+char* pathTo11 = "resources/AM2R_11";
 
-static bool CloneAutopatcher()
+bool CloneAutopatcher()
 {
-    puts("DEBUG: pretend we cloned it :3");
-    return true;
+    puts("Cloning patch data repository...");
 
     mkdir(patchDataPath, 0777);
     int size = strlen(patchDataPath) + strlen(repo) + 32;
@@ -23,8 +22,8 @@ static bool CloneAutopatcher()
     return code == 0;
 }
 
-// returns true on existing or just cloned, false on error
-bool CheckPatchData()
+// returns true on existing or just cloned, false on error or not cloned
+bool CheckPatchData(bool installIfMissing)
 {
     // check if the path data contains the 1.5.5 "mod" folder
     char* statPath = PathCat(patchDataPath, "data");
@@ -37,17 +36,13 @@ bool CheckPatchData()
             printf("FATAL: Statting directory %s/data failed with unhandled error %d\n", patchDataPath, errno);
             return false;
         }
-        puts("Cloning patch data repository...");
+        if (!installIfMissing) return false;
         if (!CloneAutopatcher())
         {
             puts("FATAL: git clone failed");
             printf("(hint: try deleting the %s directory)\n", patchDataPath);
             return false;
         }
-    }
-    else
-    {
-        puts("patch data already exists, yay");
     }
 
     return true;

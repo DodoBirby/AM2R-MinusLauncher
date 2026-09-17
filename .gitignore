@@ -4,3 +4,4 @@ libs/*.so*
 !libs/libopenal.so.1
 profiles
 launcher
+test/

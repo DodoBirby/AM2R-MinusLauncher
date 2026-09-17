@@ -49,11 +49,13 @@ static bool LowercaseRecursively(char* path)
         if (snip != NULL) // if this doesn't pass, it's hopefully the mod root, so i ignore it with cope in my heart
         {
             char dirPath[strlen(dirs[i]) + 1];
+            char dirName[strlen(dirs[i]) + 1];
             strncpy(dirPath, dirs[i], snip - dirs[i]);
-            int result = LowercaseFile(dirs[i], dirPath);
+            strncpy(dirName, snip + 1, strlen(dirs[i]) - (snip - dirs[i]));
+            int result = LowercaseFile(dirName, dirPath);
             if (result)
             {
-                printf("Install failed, could not rename %s to lowercase: error %d\n", dirs[i], errno);
+                printf("Install failed, could not rename %s to lowercase: %s\n", dirs[i], strerror(errno));
                 fail = true;
             }
         }
@@ -75,7 +77,7 @@ static bool LowercaseIteration(const char* path, char* dirs[], int* dirCount)
             if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")) // if both checks retrun non-zero, Proceed.
             {
                 dirs[*dirCount] = PathCat(path, ent->d_name);
-                printf("tracking dir %s at position %d\n", dirs[*dirCount], *dirCount);
+                //printf("tracking dir %s at position %d\n", dirs[*dirCount], *dirCount);
                 (*dirCount)++;
                 if (*dirCount >= MAXDIRS)
                 {
@@ -90,22 +92,23 @@ static bool LowercaseIteration(const char* path, char* dirs[], int* dirCount)
             int result = LowercaseFile(ent->d_name, path);
             if (result)
             {
-                printf("Install failed, could not rename %s to lowercase: error %d\n", ent->d_name, errno);
+                printf("Install failed, could not rename %s to lowercase: %s\n", ent->d_name, strerror(errno));
                 return false;
             }
         }
-        printf("%s %d\n", ent->d_name, ent->d_type);
+        //printf("%s %d\n", ent->d_name, ent->d_type);
     }
     return !fail;
 }
 
-bool InstallMod(char* modPath) // TODO: auto unzip provided mods
+bool InstallMod(char* modPath, char* profileName) // TODO: auto unzip provided mods
 {
-    char* profilePath = "profiles/modtest"; // TODO: parameterize
+    char* profilePath = PathCat(profileDir, profileName);
     // make sure this mod does not already exist
     if (!CheckFile(profilePath))
     {
         printf("Mod path %s exists, please delete it first if you wish to re-install it\n", profilePath);
+        free(profilePath);
         return false;
     }
 
@@ -114,21 +117,25 @@ bool InstallMod(char* modPath) // TODO: auto unzip provided mods
     mkdir(assetsPath, 0777);
     if (CheckFile(modPath))
     {
-        printf("Install failed, path %s could not be read\n", modPath);
+        printf("Install failed, path %s could not be read: %s\n", modPath, strerror(errno));
+        free(profilePath);
         return false;
     }
     // copy 1.1 files to the mod folder - fall back on coreutils cp for now
-    char cmd[strlen(assetsPath) + 24];
-    sprintf(cmd, "cp -r AM2R_11/* %s", assetsPath);
-    if (system(cmd))
+    char copyCmd[strlen(assetsPath) + strlen(pathTo11) + 14];
+    sprintf(copyCmd, "cp -r %s/* %s", pathTo11, assetsPath);
+    if (system(copyCmd))
     {
         puts("Install failed, could not copy AM2R 1.1 to the mod folder");
+        free(profilePath);
         return false;
     }
-    sprintf(cmd, "mv %s/AM2R.exe %s", assetsPath, profilePath);
-    if (system(cmd))
+    char moveCmd[strlen(assetsPath) + strlen(profilePath) + 18];
+    sprintf(moveCmd, "mv %s/AM2R.exe %s", assetsPath, profilePath);
+    if (system(moveCmd))
     {
         puts("Install failed, could not move AM2R.exe");
+        free(profilePath);
         return false;
     }
 
@@ -139,36 +146,40 @@ bool InstallMod(char* modPath) // TODO: auto unzip provided mods
 
     // patch the exe
     src = PathCat(profilePath, "AM2R.exe");
-    patch = "autopatcher/data/AM2R.xdelta";
+    patch = PathCat(patchDataPath, "data/AM2R.xdelta");
     dest = PathCat(profilePath, "runner");
     if (!PatchFile(src, patch, dest))
     {
         puts("Install failed, could not patch AM2R.exe");
         free(src);
         free(dest);
+        free(profilePath);
         return false;
     }
     free(src);
     free(dest);
     // patch the data.win
     src = PathCat(assetsPath, "data.win");
-    patch = "autopatcher/data/game.xdelta";
+    patch = PathCat(patchDataPath, "data/game.xdelta");
     dest = PathCat(assetsPath, "game.unx");
     if (!PatchFile(src, patch, dest))
     {
         puts("Install failed, could not patch data.win");
         free(src);
         free(dest);
+        free(profilePath);
         return false;
     }
     free(src);
     free(dest);
 
     // copy everything from files_to_copy
-    sprintf(cmd, "cp -rf autopatcher/data/files_to_copy/* %s", assetsPath);
-    if(system(cmd))
+    char copy2Cmd[strlen(assetsPath) + strlen(pathTo11) + 34];
+    sprintf(copy2Cmd, "cp -rf %s/data/files_to_copy/* %s", patchDataPath, assetsPath);
+    if(system(copy2Cmd))
     {
         puts("Install failed, could not copy mod files to the mod folder");
+        free(profilePath);
         return false;
     }
 
@@ -176,9 +187,20 @@ bool InstallMod(char* modPath) // TODO: auto unzip provided mods
     if (!LowercaseRecursively(assetsPath))
     {
         puts("Install failed, could not lowercase all files in the mod folder");
+        free(profilePath);
         return false;
     }
 
+    // copy the run script to the profile
+    char runShCmd[strlen(profilePath) + 34];
+    sprintf(runShCmd, "cp resources/run-with-libs.sh %s/", profilePath);
+    if(system(runShCmd))
+    {
+        puts("Install failed, could not copy the run script to the mod folder");
+        free(profilePath);
+        return false;
+    }
 
+    free(profilePath);
     return true;
 }

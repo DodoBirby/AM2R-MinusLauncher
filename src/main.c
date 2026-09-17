@@ -16,19 +16,14 @@ int main()
         exit(1);
     }
 
-    if (!CheckPatchData())
-        exit(1);
-
     if (!CheckForAM2R11()) // TODO: ask user to select 1.1 zip
     {
-        puts("1.1 not found! Please unzip it next to the launcher in a directory named \"AM2R_11\"");
+        puts("1.1 not found! Please unzip it next to the launcher in a directory named \"resources/AM2R_11\"");
         exit(1);
     }
 
-    if (!InstallMod("autopatcher/data"))
-    {
-        exit(1);
-    }
+    while (MainMenu()) {}
 
+    DestroyMenu();
     return 0;
 }
