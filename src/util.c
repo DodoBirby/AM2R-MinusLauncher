@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <errno.h>
+#include <linux/limits.h>
 
 // returns 0 on found, otherwise errno
 int CheckFile(char* path)
@@ -58,6 +59,42 @@ int LowercaseFile(const char* name, const char* path)
 void GetInput(char* buf, int max)
 {
     char c;
-    while ((c = getchar()) != '\n' && c != EOF) {}
+    //while ((c = getchar()) != '\n' && c != EOF) {}    UUUUUUUUGGHHHHHHHHH JUST WORKKKKKKK
     fgets(buf, max, stdin);
+    buf[strlen(buf) - 1] = '\0';
+}
+
+bool GetAndUnzipFile(char* outputPath)
+{
+    char in[PATH_MAX];
+
+    while (true)
+    {
+        fputs("Path: ", stdout);
+        GetInput(in, PATH_MAX);
+
+        int result = CheckFile(in);
+        if (result != 0)
+        {
+            perror("Failed to read provided file");
+            printf("DEBUG: provided path was %s\n", in);
+            continue;
+        }
+
+        char checkZip[strlen(in) + 25];
+        sprintf(checkZip, "unzip -Z %s &> /dev/null", in);
+        if (system(checkZip))
+        {
+            puts("unzip could not recognize this as a valid .zip archive. Please try another path.");
+            continue;
+        }
+        break;
+    }
+
+    char unzipCall[strlen(in) + strlen(outputPath) + 23];
+    sprintf(unzipCall, "unzip -d \"%s\" \"%s\"", outputPath, in);
+    if (system(unzipCall))
+        return false;
+
+    return true;
 }

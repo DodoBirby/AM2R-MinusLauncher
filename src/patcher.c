@@ -101,7 +101,7 @@ static bool LowercaseIteration(const char* path, char* dirs[], int* dirCount)
     return !fail;
 }
 
-bool InstallMod(char* modPath, char* profileName) // TODO: auto unzip provided mods
+bool InstallMod(char* modPath, char* profileName)
 {
     char* profilePath = PathCat(profileDir, profileName);
     // make sure this mod does not already exist
@@ -146,7 +146,7 @@ bool InstallMod(char* modPath, char* profileName) // TODO: auto unzip provided m
 
     // patch the exe
     src = PathCat(profilePath, "AM2R.exe");
-    patch = PathCat(patchDataPath, "data/AM2R.xdelta");
+    patch = PathCat(modPath, "AM2R.xdelta");
     dest = PathCat(profilePath, "runner");
     if (!PatchFile(src, patch, dest))
     {
@@ -174,7 +174,7 @@ bool InstallMod(char* modPath, char* profileName) // TODO: auto unzip provided m
 
     // patch the data.win
     src = PathCat(assetsPath, "data.win");
-    patch = PathCat(patchDataPath, "data/game.xdelta");
+    patch = PathCat(modPath, "game.xdelta");
     dest = PathCat(assetsPath, "game.unx");
     if (!PatchFile(src, patch, dest))
     {
@@ -189,7 +189,7 @@ bool InstallMod(char* modPath, char* profileName) // TODO: auto unzip provided m
 
     // copy everything from files_to_copy
     char copy2Cmd[strlen(assetsPath) + strlen(pathTo11) + 34];
-    sprintf(copy2Cmd, "cp -rf %s/data/files_to_copy/* %s", patchDataPath, assetsPath);
+    sprintf(copy2Cmd, "cp -rf %s/files_to_copy/* %s", modPath, assetsPath);
     if(system(copy2Cmd))
     {
         puts("Install failed, could not copy mod files to the mod folder");

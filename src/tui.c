@@ -26,7 +26,18 @@ static void Op_InstallCU()
 
 static void Op_InstallMod() // TODO
 {
-    puts("TODO, sorry");
+    system("rm -r resources/tempmod &> /dev/null");
+    puts("Please provide the path to the mod zip you wish to install.");
+    GetAndUnzipFile("resources/tempmod");
+
+    fputs("Name of mod: ", stdout);
+    char name[NAME_MAX];
+    GetInput(name, NAME_MAX);
+
+    if (InstallMod("resources/tempmod", name))
+        puts("Mod installed successfully!");
+
+    system("rm -r resources/tempmod &> /dev/null");
 }
 
 static void Op_Play()

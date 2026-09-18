@@ -65,17 +65,10 @@ bool CheckForAM2R11()
 void BegForAM2R11()
 {
     puts("This launcher requires AM2R 1.1 to function. Please provide the file path to your AM2R 1.1 zip file.");
-    char in[PATH_MAX];
 
-    while (true)
+    if (!GetAndUnzipFile(pathTo11))
     {
-        fputs("Path: ", stdin);
-        GetInput(in, PATH_MAX);
-
-        int result = CheckFile(in);
-        if (result != 0)
-        {
-            perror("Failed to read provided file");
-        }
+        puts("unzip was unable to extract your zip file. Please verify that you can unzip it with your preferred tool, and report the error provided.");
+        exit(1);
     }
 }

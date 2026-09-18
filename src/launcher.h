@@ -8,6 +8,7 @@ int CheckFile(char* path);
 char* PathCat(const char* s1, const char* s2);
 int LowercaseFile(const char* name, const char* path);
 void GetInput(char* buf, int max);
+bool GetAndUnzipFile(char* outputPath);
 
 // setup.c
 extern char* repo;
@@ -17,6 +18,7 @@ extern char* pathTo11;
 bool CloneAutopatcher();
 bool CheckPatchData(bool installIfMissing);
 bool CheckForAM2R11();
+void BegForAM2R11();
 
 // patcher.c
 bool InstallMod(char* modPath, char* profileName);

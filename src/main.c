@@ -16,10 +16,15 @@ int main()
         exit(1);
     }
 
-    if (!CheckForAM2R11()) // TODO: ask user to select 1.1 zip
+    if (!CheckForAM2R11())
     {
-        puts("1.1 not found! Please unzip it next to the launcher in a directory named \"resources/AM2R_11\"");
-        exit(1);
+        BegForAM2R11();
+        if (!CheckForAM2R11())
+        {
+            puts("AM2R 1.1's data.win could not be found! Something must have gone wrong extracting it. Please report this.");
+            exit(1);
+        }
+        else puts("1.1 successfully copied for patching.");
     }
 
     while (MainMenu()) {}
