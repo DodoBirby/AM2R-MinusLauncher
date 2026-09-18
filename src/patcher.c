@@ -156,8 +156,22 @@ bool InstallMod(char* modPath, char* profileName) // TODO: auto unzip provided m
         free(profilePath);
         return false;
     }
+
+    // make the runner runnable
+    struct stat perm;
+    if (stat(dest, &perm))
+    {
+        perror("Failed to stat the runner file");
+        return false;
+    }
+    if (chmod(dest, perm.st_mode | 0100)) // make the file executable by the owning user
+    {
+        perror("Failed to make the runner file executable");
+        return false;
+    }
     free(src);
     free(dest);
+
     // patch the data.win
     src = PathCat(assetsPath, "data.win");
     patch = PathCat(patchDataPath, "data/game.xdelta");

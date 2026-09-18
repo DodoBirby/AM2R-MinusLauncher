@@ -10,14 +10,15 @@
 char* profileDir = "profiles";
 char* cuProfile = "CommunityUpdates";
 
-// count number of profiles
-int ProfileCount()
+// count number of profiles. all strings and the array must be manually freed
+char** GetProfiles(int* out_count)
 {
+    *out_count = 0;
     int check = CheckFile(profileDir);
     if (check == ENOENT)
     {
         mkdir(profileDir, 0777);
-        return 0;
+        return NULL;
     }
     else if (check != 0)
     {
@@ -25,15 +26,25 @@ int ProfileCount()
         exit(1);
     }
 
+    int size = 8;
+    char** dirs = calloc(size, sizeof(char*));
     DIR* dir = opendir(profileDir);
     struct dirent* ent;
-    int count = 0;
     while ((ent = readdir(dir)) != NULL)
     {
         if (ent->d_type == DT_DIR && strcmp(ent->d_name, ".") && strcmp(ent->d_name, ".."))
-            count++;
+        {
+            dirs[*out_count] = malloc(strlen(ent->d_name) + 1);
+            strcpy(dirs[*out_count], ent->d_name);
+            (*out_count)++;
+            if (*out_count >= size)
+            {
+                size *= 2;
+                dirs = realloc(dirs, size * sizeof(char*));
+            }
+        }
     }
-    return count;
+    return dirs;
 }
 
 // check if CU is installed
@@ -43,4 +54,15 @@ bool IsCUInstalled()
     int check = CheckFile(dir);
     free(dir);
     return check == 0;
+}
+
+int GetProfileCount()
+{
+    int count;
+    char** arr = GetProfiles(&count);
+    for (int i = 0; i < count; i++)
+        free(arr[i]);
+
+    free(arr);
+    return count;
 }

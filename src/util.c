@@ -54,3 +54,10 @@ int LowercaseFile(const char* name, const char* path)
     free(newName);
     return 0;
 }
+
+void GetInput(char* buf, int max)
+{
+    char c;
+    while ((c = getchar()) != '\n' && c != EOF) {}
+    fgets(buf, max, stdin);
+}

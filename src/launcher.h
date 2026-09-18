@@ -7,6 +7,7 @@
 int CheckFile(char* path);
 char* PathCat(const char* s1, const char* s2);
 int LowercaseFile(const char* name, const char* path);
+void GetInput(char* buf, int max);
 
 // setup.c
 extern char* repo;
@@ -24,8 +25,9 @@ bool InstallMod(char* modPath, char* profileName);
 extern char* profileDir;
 extern char* cuProfile;
 
-int ProfileCount();
+char** GetProfiles(int* out_count);
 bool IsCUInstalled();
+int GetProfileCount();
 
 // tui.c
 bool MainMenu();

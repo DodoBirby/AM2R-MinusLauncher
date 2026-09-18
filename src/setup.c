@@ -1,3 +1,4 @@
+#include <linux/limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,4 +60,22 @@ bool CheckForAM2R11()
     }
     free(statPath);
     return true;
+}
+
+void BegForAM2R11()
+{
+    puts("This launcher requires AM2R 1.1 to function. Please provide the file path to your AM2R 1.1 zip file.");
+    char in[PATH_MAX];
+
+    while (true)
+    {
+        fputs("Path: ", stdin);
+        GetInput(in, PATH_MAX);
+
+        int result = CheckFile(in);
+        if (result != 0)
+        {
+            perror("Failed to read provided file");
+        }
+    }
 }
