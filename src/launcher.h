@@ -33,6 +33,5 @@ int GetProfileCount();
 
 // tui.c
 bool MainMenu();
-void DestroyMenu();
 
 #endif

@@ -101,76 +101,64 @@ static void Op_Play()
 
 static void Op_Exit() {}
 
-bool menuInitialized = false;
-MenuOption* op_download;
-MenuOption* op_installCU;
-MenuOption* op_installMod;
-MenuOption* op_play;
-MenuOption* op_exit;
+MenuOption op_download = {
+    .opText = "Download Patch Data",
+    .selected = Op_Download,
+    .closeAfter = false
+};
+MenuOption op_installCU = {
+    .opText = "Install Community Updates",
+    .selected = Op_InstallCU,
+    .closeAfter = false
+};
+MenuOption op_installMod = {
+    .opText = "Install a mod",
+    .selected = Op_InstallMod,
+    .closeAfter = false
+};
+MenuOption op_play = {
+    .opText = "Launch a profile",
+    .selected = Op_Play,
+    .closeAfter = false
+};
+MenuOption op_exit = {
+    .opText = "Exit",
+    .selected = Op_Exit,
+    .closeAfter = true
+};
 
 #define ITEMS 5
 MenuOption* options[ITEMS];
 
-static void InitializeMenu()
-{
-
-    op_download = malloc(sizeof(MenuOption));
-    op_download->opText = "Download Patch Data";
-    op_download->selected = Op_Download;
-    op_download->closeAfter = false;
-
-    op_installCU = malloc(sizeof(MenuOption));
-    op_installCU->opText = "Install Community Updates";
-    op_installCU->selected = Op_InstallCU;
-    op_installCU->closeAfter = false;
-
-    op_installMod = malloc(sizeof(MenuOption));
-    op_installMod->opText = "Install a mod";
-    op_installMod->selected = Op_InstallMod;
-    op_installMod->closeAfter = false;
-
-    op_play = malloc(sizeof(MenuOption));
-    op_play->opText = "Launch a profile";
-    op_play->selected = Op_Play;
-    op_play->closeAfter = false; // TODO: config option
-
-    op_exit = malloc(sizeof(MenuOption));
-    op_exit->opText = "Exit";
-    op_exit->selected = Op_Exit;
-    op_exit->closeAfter = true;
-}
-
 bool MainMenu()
 {
-    if (!menuInitialized) InitializeMenu();
-
     for (int i = 0; i < ITEMS; i++)
         options[i] = NULL;
 
     int pos = 0;
     if (GetProfileCount() > 0) // show play option
     {
-        options[pos] = op_play;
+        options[pos] = &op_play;
         pos++;
     }
     if (!CheckPatchData(false)) // show download option
     {
-        options[pos] = op_download;
+        options[pos] = &op_download;
         pos++;
     }
     if (!IsCUInstalled() && CheckPatchData(false)) // show install CU option
     {
-        options[pos] = op_installCU;
+        options[pos] = &op_installCU;
         pos++;
     }
     if (CheckPatchData(false)) // show install mod option
     {
-        options[pos] = op_installMod;
+        options[pos] = &op_installMod;
         pos++;
     }
     if (true) // show exit option
     {
-        options[pos] = op_exit;
+        options[pos] = &op_exit;
         pos++;
     }
 
@@ -200,11 +188,4 @@ bool MainMenu()
     }
     options[choice]->selected();
     return !(options[choice]->closeAfter);
-}
-
-void DestroyMenu()
-{
-    free(op_download);
-    free(op_installCU);
-    free(op_play);
 }
