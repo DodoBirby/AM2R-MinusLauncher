@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "launcher.h"
 
 typedef struct
@@ -14,7 +15,8 @@ typedef struct
 
 static void Op_Download()
 {
-    CloneAutopatcher();
+    if (!CloneAutopatcher())
+        puts("Something went wrong trying to set up the patch data.");
 }
 
 static void Op_InstallCU()
@@ -24,7 +26,7 @@ static void Op_InstallCU()
     free(path);
 }
 
-static void Op_InstallMod() // TODO
+static void Op_InstallMod()
 {
     system("rm -r resources/tempmod &> /dev/null");
     puts("Please provide the path to the mod zip you wish to install.");
@@ -97,13 +99,16 @@ static void Op_Play()
     free(profiles);
 }
 
+static void Op_Exit() {}
+
 bool menuInitialized = false;
 MenuOption* op_download;
 MenuOption* op_installCU;
 MenuOption* op_installMod;
 MenuOption* op_play;
+MenuOption* op_exit;
 
-#define ITEMS 4
+#define ITEMS 5
 MenuOption* options[ITEMS];
 
 static void InitializeMenu()
@@ -127,7 +132,12 @@ static void InitializeMenu()
     op_play = malloc(sizeof(MenuOption));
     op_play->opText = "Launch a profile";
     op_play->selected = Op_Play;
-    op_play->closeAfter = true;
+    op_play->closeAfter = false; // TODO: config option
+
+    op_exit = malloc(sizeof(MenuOption));
+    op_exit->opText = "Exit";
+    op_exit->selected = Op_Exit;
+    op_exit->closeAfter = true;
 }
 
 bool MainMenu()
@@ -153,9 +163,14 @@ bool MainMenu()
         options[pos] = op_installCU;
         pos++;
     }
-    if (true) // show install mod option
+    if (CheckPatchData(false)) // show install mod option
     {
         options[pos] = op_installMod;
+        pos++;
+    }
+    if (true) // show exit option
+    {
+        options[pos] = op_exit;
         pos++;
     }
 

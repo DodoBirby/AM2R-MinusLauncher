@@ -39,10 +39,8 @@ int LowercaseFile(const char* name, const char* path)
 
     char* oldName = PathCat(path, name);
     char* newName = PathCat(path, lowered);
-    //printf("%s %s: ", oldName, newName);
     if (strcmp(oldName, newName))
     {
-        //puts("not equal");
         if (rename(oldName, newName))
         {
             free(oldName);
@@ -50,7 +48,6 @@ int LowercaseFile(const char* name, const char* path)
             return errno;
         }
     }
-    //else puts("equal");
     free(oldName);
     free(newName);
     return 0;
@@ -58,7 +55,7 @@ int LowercaseFile(const char* name, const char* path)
 
 void GetInput(char* buf, int max)
 {
-    char c;
+    //char c;
     //while ((c = getchar()) != '\n' && c != EOF) {}    UUUUUUUUGGHHHHHHHHH JUST WORKKKKKKK
     fgets(buf, max, stdin);
     buf[strlen(buf) - 1] = '\0';

@@ -7,7 +7,7 @@
 #include <string.h>
 #include "launcher.h"
 
-char* profileDir = "profiles";
+char* profileDir = "profiles"; // TODO: config option
 char* cuProfile = "CommunityUpdates";
 
 // count number of profiles. all strings and the array must be manually freed

@@ -5,3 +5,5 @@ libs/*.so*
 profiles
 launcher
 test/
+pkg/
+do-test.sh

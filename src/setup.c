@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "launcher.h"
 
-char* repo = "https://github.com/AM2R-Community-Developers/AM2R-Autopatcher-Linux.git";
+char* repo = "https://github.com/AM2R-Community-Developers/AM2R-Autopatcher-Linux.git"; // TODO: config option
 char* patchDataPath = "resources/autopatcher";
 char* pathTo11 = "resources/AM2R_11";
 
@@ -19,8 +19,15 @@ bool CloneAutopatcher()
     int size = strlen(patchDataPath) + strlen(repo) + 32;
     char cmd[size];
     sprintf(cmd, "git clone --depth 1 %s %s", repo, patchDataPath);
-    int code = system(cmd);
-    return code == 0;
+    if (system(cmd))
+        return false;
+
+    char copyCmd[strlen(patchDataPath) + 40];
+    sprintf(copyCmd, "cp %s/data/AM2R.AppDir/usr/lib32/* libs", patchDataPath);
+    if (system(copyCmd))
+        return false;
+
+    return true;
 }
 
 // returns true on existing or just cloned, false on error or not cloned
