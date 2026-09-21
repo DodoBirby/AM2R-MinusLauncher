@@ -44,8 +44,9 @@ static void Op_InstallMod()
 
 static void Op_Play()
 {
-    int count;
-    char** profiles = GetProfiles(&count);
+    ProfileList profileList = GetProfiles();
+    int count = profileList.length;
+    char** profiles = profileList.ptr;
     int choice;
     while (true)
     {
@@ -65,12 +66,13 @@ static void Op_Play()
 
         printf("Invalid choice: %s\n", in);
     }
+    char* chosenProfile = profiles[choice];
 
-    printf("Opening profile %s...\n", profiles[choice]);
+    printf("Opening profile %s...\n", chosenProfile);
     fflush(stdout);
 
     // pre-calc these because the child is only allowed to touch the PID and call exec
-    char* profilePath = PathCat(profileDir, profiles[choice]);
+    char* profilePath = PathCat(profileDir, chosenProfile);
     char* scriptName = "run-with-libs.sh";
     char* scriptPath = PathCat(profilePath, scriptName);
     pid_t pid;
@@ -94,9 +96,7 @@ static void Op_Play()
 
     free(scriptPath);
     free(profilePath);
-    for (int i = 0; i < count; i++)
-        free(profiles[i]);
-    free(profiles);
+    freeProfiles(profileList);
 }
 
 static void Op_Exit() {}

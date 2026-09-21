@@ -27,7 +27,13 @@ bool InstallMod(char* modPath, char* profileName);
 extern char* profileDir;
 extern char* cuProfile;
 
-char** GetProfiles(int* out_count);
+typedef struct {
+    char** ptr;
+    int length;
+} ProfileList;
+
+ProfileList GetProfiles();
+void freeProfiles(ProfileList list);
 bool IsCUInstalled();
 int GetProfileCount();
 
