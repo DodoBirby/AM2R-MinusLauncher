@@ -96,7 +96,7 @@ static void Op_Play()
 
     free(scriptPath);
     free(profilePath);
-    freeProfiles(profileList);
+    FreeProfiles(profileList);
 }
 
 static void Op_Exit() {}

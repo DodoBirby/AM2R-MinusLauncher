@@ -33,7 +33,7 @@ typedef struct {
 } ProfileList;
 
 ProfileList GetProfiles();
-void freeProfiles(ProfileList list);
+void FreeProfiles(ProfileList list);
 bool IsCUInstalled();
 int GetProfileCount();
 

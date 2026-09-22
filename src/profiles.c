@@ -10,7 +10,7 @@
 char* profileDir = "profiles"; // TODO: config option
 char* cuProfile = "CommunityUpdates";
 
-// count number of profiles. caller must free return value using freeProfiles
+// count number of profiles. caller must free return value using FreeProfiles
 ProfileList GetProfiles()
 {
     int length = 0;
@@ -55,7 +55,7 @@ ProfileList GetProfiles()
     return result;
 }
 
-void freeProfiles(ProfileList list)
+void FreeProfiles(ProfileList list)
 {
     for (int i = 0; i < list.length; i++) {
         free(list.ptr[i]);
@@ -76,6 +76,6 @@ int GetProfileCount()
 {
     ProfileList arr = GetProfiles();
     int count = arr.length;
-    freeProfiles(arr);
+    FreeProfiles(arr);
     return count;
 }
